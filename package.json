@@ -1,0 +1,34 @@
+{
+  "name": "cylon-api-socket-io",
+  "version": "0.1.0",
+  "main": "lib/socketio-api.js",
+  "description": "Socket.io API add-on module for Cylon.JS",
+  "homepage": "http://cylonjs.com",
+  "bugs": "https://github.com/hybridgroup/cylon-api-socketio/issues",
+
+  "author": "The Hybrid Group <cylonjs@hybridgroup.com>",
+
+  "contributors": [
+    "Edgar Silva <edgar@hybridgroup.com>"
+  ],
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hybridgroup/cylon-api-socketio"
+  },
+
+  "license": "Apache 2.0",
+
+  "devDependencies": {
+    "sinon-chai": "2.6.0",
+    "chai":       "1.10.0",
+    "mocha":      "2.0.1",
+    "sinon":      "1.12.1"
+  },
+
+  "dependencies": {
+    "express": "^4.11.1",
+    "socket.io": "^1.3.2",
+    "lodash":      "2.4.1"
+  }
+}
