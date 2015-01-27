@@ -16,17 +16,49 @@
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script>
-    var socket = io();
+    var cylon, robot, device;
 
     window.onload = function() {
-      $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
+      cylon = io('/api/robots');
+
+      console.log('Setting up socket connections:');
+
+      cylon.emit('robots');
+
+      cylon.on('robots', function(list) {
+        console.log('list of robots:', list);
+
+        if (!robot) {
+          robot = io('/api/robots/' + list[0]);
+
+          robot.on('devices', function(devices) {
+            console.log('NAMESPACE =>', robot.nsp + '/devices/' + devices[0]);
+            if (!device) {
+              device = io(robot.nsp + '/devices/' + devices[0]);
+
+              device.on('message', function(msg) {
+                console.log('Device Local msg --->', msg);
+              });
+
+              device.on('message', function(msg) {
+                $('#messages').append($('<li>').text(msg));
+              });
+            }
+          });
+
+          robot.emit('devices');
+
+          msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
+
+          $('#messages').append($('<li>').text(msg));
+        }
       });
-      socket.on('chat message', function(msg) {
-        console.log(msg);
-        $('#messages').append($('<li>').text(msg));
+
+      $('form').submit(function(){
+        device.emit('message', $('#m').val());
+        $('#m').val('');
+
+        return false;
       });
     };
   </script>
