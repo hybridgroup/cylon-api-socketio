@@ -23,8 +23,6 @@
 
       console.log('Setting up socket connections:');
 
-      cylon.emit('robots');
-
       cylon.on('robots', function(list) {
         console.log('list of robots:', list);
 
@@ -32,17 +30,34 @@
           robot = io('/api/robots/' + list[0]);
 
           robot.on('devices', function(devices) {
-            console.log('NAMESPACE =>', robot.nsp + '/devices/' + devices[0]);
             if (!device) {
               device = io(robot.nsp + '/devices/' + devices[0]);
 
               device.on('message', function(msg) {
-                console.log('Device Local msg --->', msg);
-              });
-
-              device.on('message', function(msg) {
                 $('#messages').append($('<li>').text(msg));
               });
+
+              device.on('commands', function(commands) {
+                var msg = 'commands:' + commands.toString();
+                console.log('commands ==>');
+                console.log(commands);
+                $('#messages').append($('<li>').text(msg));
+              });
+
+              device.on('command', function(command, value) {
+                console.log('command name ==>', command);
+                console.log('command returned ==>', value);
+              });
+
+              device.on('events', function(events) {
+                var msg = 'events:' + events.toString();
+                console.log('events ==>');
+                console.log(events);
+                $('#messages').append($('<li>').text(msg));
+              });
+
+              device.emit('commands');
+              device.emit('events');
             }
           });
 
