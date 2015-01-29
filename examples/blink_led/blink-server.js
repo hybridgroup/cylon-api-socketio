@@ -15,7 +15,7 @@ Object.keys(bots).forEach(function(name) {
     },
 
     devices: {
-      asensor: { driver: 'analog-sensor', pin: 0 }
+      led: { driver: 'led', pin: 13 }
     },
 
     work: function() {
@@ -24,7 +24,6 @@ Object.keys(bots).forEach(function(name) {
       // we are going to be interacting
       // with the robot using the code in
       // ./analog-read-client.html.
-
     }
   });
 });
