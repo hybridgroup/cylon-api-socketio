@@ -19,24 +19,38 @@
     var cylon, robot, device;
 
     window.onload = function() {
+      // Connect to the main api socket
       cylon = io('http://127.0.0.1/api/robots');
 
       console.log('Setting up socket connections:');
 
+      // On connection the 'robots' event is emitted
+      // and returns a list of available robots.
       cylon.on('robots', function(list) {
         console.log('list of robots:', list);
 
         if (!robot) {
+          // Once we have a list of available robots we can use 
+          // any of them and connect to their socket.
           robot = io('http://127.0.0.1/api/robots/' + list[0]);
 
+          // Similar to how the main api socket emits a robot,
+          // but instead emits 'devices' which sends back a list of
+          // available devices.
           robot.on('devices', function(devices) {
             if (!device) {
+              // Same as with robots we use the list of devices to connect to them
+              // in this case we already know which device we want to connect to,
+              // so we create a new socket for `asensor` device.
               device = io('http://127.0.0.1' + robot.nsp + '/devices/asensor');
 
+              // Listen to the 'message' event on device
               device.on('message', function(msg) {
                 $('#messages').append($('<li>').text(msg));
               });
 
+              // Listen to the 'commands' event on device
+              // returns a list of available commands for the device
               device.on('commands', function(commands) {
                 var msg = 'commands:' + commands.toString();
                 console.log('commands ==>');
@@ -44,11 +58,16 @@
                 $('#messages').append($('<li>').text(msg));
               });
 
+              // Every time a commands is executed the 'command' event
+              // is triggered, returns the name of the command executed
+              // and the value returned
               device.on('command', function(command, value) {
                 console.log('command name ==>', command);
                 console.log('command returned ==>', value);
               });
 
+              // Listen to the 'events' event on device
+              // returns a list of available events for the device
               device.on('events', function(events) {
                 var msg = 'events:' + events.toString();
                 console.log('events ==>');
@@ -56,12 +75,38 @@
                 $('#messages').append($('<li>').text(msg));
               });
 
+              // We emit 'commands' and 'events' so we can listen
+              // and get the lists of available items
               device.emit('commands');
               device.emit('events');
 
+              // This is how we listen for an event triggered by a
+              // device, pretty much the same than doing it in the work
+              // block of the robot accessing the device directly.
+              // The same events are available for device siockets.
               device.on('upperLimit', function(value) {
                 console.log('Analog read ==>', value);
               });
+
+              /*
+                // There are two ways to send commands to a device,
+                // The first one (we preffer this one) is by emitting
+                // an event using the name of the command for the event,
+                // and passing the args as regular function args.
+                device.emit('turn_on', 'arg1', 'arg2', 'arg3')
+
+                // In the second one you emit a 'command' event and
+                // pass the command specifics inside an object.
+                device.emit(
+                  'command',
+                  {
+                    command: 'turn_on',
+                    args: ['arg1', 'arg2', 'arg3']
+                  }
+                )'
+
+                // They do pretty much the same just different syntax sugar
+              */
             }
           });
 
