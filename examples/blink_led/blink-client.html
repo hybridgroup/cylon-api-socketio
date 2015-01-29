@@ -80,8 +80,9 @@
               device.emit('commands');
               device.emit('events');
 
-              device.emit('turn_on');
-
+              setInterval(function() {
+                device.emit('toggle');
+              }, 1000);
               /*
                 // There are two ways to send commands to a device,
                 // The first one (we preffer this one) is by emitting
