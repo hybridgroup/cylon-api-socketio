@@ -52,7 +52,10 @@
               });
 
               // Listen to the 'commands' event on device
-              // returns a list of available commands for the device
+              // returns a list of available commands for the device,
+              // you need to first send a 'commands' event down
+              // the socket, so it knows to trigger this event
+              // with the list of commands.
               device.on('commands', function(commands) {
                 var msg = 'commands:' + commands.toString();
                 console.log('commands ==>');
@@ -60,16 +63,18 @@
                 $('#messages').append($('<li>').text(msg));
               });
 
-              // Every time a commands is executed the 'command' event
+              // Every time a command is executed the 'command' event
               // is triggered, returns the name of the command executed
-              // and the value returned
+              // and the value returned by the method the command calls.
               device.on('command', function(command, value) {
                 console.log('command name ==>', command);
                 console.log('command returned ==>', value);
               });
 
               // Listen to the 'events' event on device
-              // returns a list of available events for the device
+              // returns a list of available events for the device,
+              // same as with commands you need to emit a 'events'
+              // event first.
               device.on('events', function(events) {
                 var msg = 'events:' + events.toString();
                 console.log('events ==>');
@@ -78,13 +83,17 @@
               });
 
               // We emit 'commands' and 'events' so we can listen
-              // and get the lists of available items
+              // and get the lists of available items.
               device.emit('commands');
               device.emit('events');
 
+              // The "hello world" program of robotics, the
+              // blink and LED program, we just emit the command
+              // we want our device to execute.
               setInterval(function() {
                 device.emit('toggle');
               }, 1000);
+
               /*
                 // There are two ways to send commands to a device,
                 // The first one (we preffer this one) is by emitting
@@ -104,6 +113,32 @@
 
                 // They do pretty much the same just different syntax sugar
               */
+            }
+          });
+
+          msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
+
+          $('#messages').append($('<li>').text(msg));
+        }
+      });
+
+      $('form').submit(function(){
+        device.emit('message', $('#m').val());
+        $('#m').val('');
+
+        return false;
+      });
+    };
+  </script>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+  </body>
+</html>
+
+              
             }
           });
 

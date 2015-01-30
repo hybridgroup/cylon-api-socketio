@@ -89,95 +89,57 @@ to them using Socket.io through cylon using the following code:
     var cylon, robot, device;
 
     window.onload = function() {
-      // Connect to the main api socket
-      cylon = io('http://127.0.0.1/api/robots');
+      if (!device) {
+        // Since we already know which device we want to connect to,
+        // we create a new socket for the `led` device.
+        device = io('http://127.0.0.1/api/robots/rosie/devices/led');
 
-      console.log('Setting up socket connections:');
-
-      // On connection the 'robots' event is emitted
-      // and returns a list of available robots.
-      cylon.on('robots', function(robots) {
-        if (!robot) {
-          console.log('List of robots:', robots);
-
-          // Once we have a list of available robots we can use
-          // any of them and connect to their socket.
-          robot = io('http://127.0.0.1/api/robots/' + robots[0]);
-
-          // Similar to how the main api socket emits a robots event
-          // with a list of available robots, but instead
-          // emits 'devices' which sends back a list of
-          // available devices.
-          robot.on('devices', function(devices) {
-            if (!device) {
-              console.log('List of devices:', devices);
-              // Same as with robots we use the list of devices to connect to them
-              // in this case we already know which device we want to connect to,
-              // so we create a new socket for `asensor` device.
-              device = io('http://127.0.0.1' + robot.nsp + '/devices/led');
-
-              // Listen to the 'message' event on device
-              device.on('message', function(msg) {
-                $('#messages').append($('<li>').text(msg));
-              });
-
-              // Listen to the 'commands' event on device
-              // returns a list of available commands for the device,
-              // you need to first send a 'commands' event down
-              // the socket, so it knows to trigger this event
-              // with the list of commands.
-              device.on('commands', function(commands) {
-                var msg = 'commands:' + commands.toString();
-                console.log('commands ==>');
-                console.log(commands);
-                $('#messages').append($('<li>').text(msg));
-              });
-
-              // Every time a command is executed the 'command' event
-              // is triggered, returns the name of the command executed
-              // and the value returned by the method the command calls.
-              device.on('command', function(command, value) {
-                console.log('command name ==>', command);
-                console.log('command returned ==>', value);
-              });
-
-              // Listen to the 'events' event on device
-              // returns a list of available events for the device,
-              // same as with commands you need to emit a 'events'
-              // event first.
-              device.on('events', function(events) {
-                var msg = 'events:' + events.toString();
-                console.log('events ==>');
-                console.log(events);
-                $('#messages').append($('<li>').text(msg));
-              });
-
-              // We emit 'commands' and 'events' so we can listen
-              // and get the lists of available items.
-              device.emit('commands');
-              device.emit('events');
-
-              // The "hello world" program of robotics, the
-              // blink and LED program, we just emit the command
-              // we want our device to execute.
-              setInterval(function() {
-                device.emit('toggle');
-              }, 1000);
-            }
-          });
-
-          msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
-
+        // Listen to the 'message' event on device
+        device.on('message', function(msg) {
           $('#messages').append($('<li>').text(msg));
-        }
-      });
+        });
 
-      $('form').submit(function(){
-        device.emit('message', $('#m').val());
-        $('#m').val('');
+        // Listen to the 'commands' event on device
+        // returns a list of available commands for the device,
+        // you need to first send a 'commands' event down
+        // the socket, so it knows to trigger this event
+        // with the list of commands.
+        device.on('commands', function(commands) {
+          var msg = 'commands:' + commands.toString();
+          console.log('commands ==>', commands);
+          $('#messages').append($('<li>').text(msg));
+        });
 
-        return false;
-      });
+        // Every time a command is executed the 'command' event
+        // is triggered, returns the name of the command executed
+        // and the value returned by the method the command calls.
+        device.on('command', function(command, value) {
+          console.log('command name ==>', command);
+          console.log('command returned ==>', value);
+        });
+
+        // Listen to the 'events' event on device
+        // returns a list of available events for the device,
+        // same as with commands you need to emit a 'events'
+        // event first.
+        device.on('events', function(events) {
+          var msg = 'events:' + events.toString();
+          console.log('events ==>', events);
+          $('#messages').append($('<li>').text(msg));
+        });
+
+        // We emit 'commands' and 'events' so we can listen
+        // and get the lists of available items.
+        device.emit('commands');
+        device.emit('events');
+
+        // The "hello world" program of robotics, the
+        // blink and LED program, we just emit the command
+        // we want our device to execute.
+        setInterval(function() {
+          device.emit('toggle');
+        }, 1000);
+      }
     };
   </script>
   <body>

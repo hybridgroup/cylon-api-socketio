@@ -15,7 +15,7 @@
   </head>
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
+  <script type="text/javascript">
     var cylon, robot, device;
 
     window.onload = function() {
@@ -26,13 +26,13 @@
 
       // On connection the 'robots' event is emitted
       // and returns a list of available robots.
-      cylon.on('robots', function(list) {
-        console.log('list of robots:', list);
-
+      cylon.on('robots', function(robots) {
         if (!robot) {
+          console.log('list of robots:', robots);
+
           // Once we have a list of available robots we can use 
           // any of them and connect to their socket.
-          robot = io('http://127.0.0.1/api/robots/' + list[0]);
+          robot = io('http://127.0.0.1/api/robots/' + robots[0]);
 
           // Similar to how the main api socket emits a robot,
           // but instead emits 'devices' which sends back a list of
@@ -85,6 +85,10 @@
               // block of the robot accessing the device directly.
               // The same events are available for device siockets.
               device.on('upperLimit', function(value) {
+                console.log('Upper limit reached ==>', value);
+              });
+
+              device.on('analogRead', function(value) {
                 console.log('Analog read ==>', value);
               });
 
@@ -109,8 +113,6 @@
               */
             }
           });
-
-          robot.emit('devices');
 
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
 
