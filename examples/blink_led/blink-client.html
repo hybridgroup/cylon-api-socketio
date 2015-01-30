@@ -15,7 +15,7 @@
   </head>
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
+  <script type="text/javascript">
     var cylon, robot, device;
 
     window.onload = function() {
@@ -26,19 +26,21 @@
 
       // On connection the 'robots' event is emitted
       // and returns a list of available robots.
-      cylon.on('robots', function(list) {
-        console.log('list of robots:', list);
-
+      cylon.on('robots', function(robots) {
         if (!robot) {
+          console.log('List of robots:', robots);
+
           // Once we have a list of available robots we can use
           // any of them and connect to their socket.
-          robot = io('http://127.0.0.1/api/robots/' + list[0]);
+          robot = io('http://127.0.0.1/api/robots/' + robots[0]);
 
-          // Similar to how the main api socket emits a robot,
-          // but instead emits 'devices' which sends back a list of
+          // Similar to how the main api socket emits a robots event
+          // with a list of available robots, but instead
+          // emits 'devices' which sends back a list of
           // available devices.
           robot.on('devices', function(devices) {
             if (!device) {
+              console.log('List of devices:', devices);
               // Same as with robots we use the list of devices to connect to them
               // in this case we already know which device we want to connect to,
               // so we create a new socket for `asensor` device.
@@ -104,8 +106,6 @@
               */
             }
           });
-
-          robot.emit('devices');
 
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
 
