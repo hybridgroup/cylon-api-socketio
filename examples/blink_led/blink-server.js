@@ -31,7 +31,7 @@ Object.keys(bots).forEach(function(name) {
 // ensure you install the API plugin first:
 // $ npm install cylon-api-socket-io
 Cylon.api(
-  'socket-io',
+  'socketio',
   {
   host: "0.0.0.0",
   port: "3000"
