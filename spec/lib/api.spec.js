@@ -4,176 +4,160 @@
 //var https = require("https"),
     //path = require("path");
 
-var API = source("socketio-api");
+var API = source('api');
 
-//var MockRequest = support("mock_request"),
-//MockResponse = support("mock_response");
+// var http = ('http');
+//var SocketMaster = require('../../lib/socket-master.js');
 
 describe("Socket.io API", function() {
   var api;
 
   beforeEach(function() {
-    api = new API();
-    stub(console, "log");
+    api = new API({ mcp: { attr1: 'mcp' } });
+    //stub(console, "log");
   });
 
-  it("needs tests!!!");
-  /*
   afterEach(function() {
-    console.log.restore();
+    //console.log.restore();
   });
 
-  describe("constructor", function() {
-    var mod;
+  describe("#constructor", function() {
+    it('sets @name', function() {
+      expect(api.name).to.be.eql('socketio');
+    });
+
+    it('sets @host', function() {
+      expect(api.host).to.be.eql('127.0.0.1');
+    });
+
+    it('sets @port', function() {
+      expect(api.port).to.be.eql('3000');
+    });
+
+    it('sets @port', function() {
+      expect(api.mcp).to.be.eql({ attr1: 'mcp' });
+    });
+  });
+
+  describe('#createServer', function() {
+     var res, next, ins;
 
     beforeEach(function() {
-      mod = new API({
-        host: "0.0.0.0",
-        port: "1234"
-      });
-    });
+      ins = {
+        set: stub(),
+        get: stub(),
+        use: stub()
+      };
 
-    it("sets @express to an Express instance", function() {
-      expect(api.express.listen).to.be.a("function");
-    });
+      stub(api, '_express').returns(ins);
+      stub(api, '_newSM').returns({ start: spy() });
+      stub(api, '_http').returns({});
 
-    it("sets default values", function() {
-      expect(api.host).to.be.eql("127.0.0.1");
-      expect(api.port).to.be.eql("3000");
-    });
+      res = {
+        sendFile: spy(),
+        status: spy(),
+        json: spy()
+      };
 
-    it("overrides default values if passed to constructor", function() {
-      expect(mod.host).to.be.eql("0.0.0.0");
-      expect(mod.port).to.be.eql("1234");
-    });
+      next = spy();
 
-    it("sets the server title", function() {
-      var title = api.express.get("title");
-      expect(title).to.be.eql("Cylon API Server");
-    });
-  });
+      ins.get.yields(null, res);
+      ins.use.yields({}, null, res, next);
 
-  describe("default", function() {
-    var d = API.prototype.defaults;
-
-    it("host", function() {
-      expect(d.host).to.be.eql("127.0.0.1");
-    });
-
-    it("port", function() {
-      expect(d.port).to.be.eql("3000");
-    });
-
-    it("auth", function() {
-      expect(d.auth).to.be.eql(false);
-    });
-
-    it("CORS", function() {
-      expect(d.CORS).to.be.eql("");
-    });
-
-    it("ssl", function() {
-      var sslDir = path.normalize(__dirname + "/../../lib/api/ssl/");
-      expect(d.ssl.key).to.be.eql(sslDir + "server.key");
-      expect(d.ssl.cert).to.be.eql(sslDir + "server.crt");
-    });
-  });
-
-  describe("#createServer", function() {
-    it("sets @express to an express server", function() {
-      api.express = null;
       api.createServer();
-      expect(api.express).to.be.a("function");
     });
 
-    context("if SSL is configured", function() {
-      it("sets @server to a https.Server instance", function() {
-        api.createServer();
-        expect(api.server).to.be.an.instanceOf(https.Server);
-      });
+    afterEach(function() {
+      api._newSM.restore();
+      api._express.restore();
     });
 
-    context("if SSL is not configured", function() {
-      beforeEach(function() {
-        api.ssl = false;
-        api.createServer();
+    it('sets @express', function() {
+      expect(api.express).to.not.be.undefined();
+    });
+
+    it('sets @server', function() {
+      expect(api.server).to.not.be.undefined();
+    });
+
+    it('sets @http', function() {
+      expect(api.http).to.not.be.undefined();
+    });
+
+    it('calls #_newSM', function() {
+      expect(api._newSM).to.be.calledOnce;
+    });
+
+    it('sets #sm', function() {
+      expect(api.sm).to.not.be.undefined();
+    });
+
+    it('calls #sm#start', function() {
+      expect(api.sm.start).to.be.calledOnce;
+    });
+
+    it('calls #express#set with', function() {
+      var txt = 'Cylon Socket.io API Server';
+      expect(api.express.set).to.be.calledWith('title', txt);
+    });
+
+    it('calls #express#get with', function() {
+      expect(api.express.get).to.be.calledWith('/');
+    });
+
+    it('calls #express#get to trigger a callback and call', function() {
+      expect(res.sendFile).to.be.calledOnce;
+    });
+
+    it('calls #express#use', function() {
+      expect(api.express.use).to.be.calledOnce;
+    });
+
+    it('calls #express#use ', function() {
+      expect(api.express.use).to.be.calledOnce;
+    });
+
+    describe('#express#use', function() {
+      it('calls res#status with 500', function() {
+        expect(res.status).to.be.calledWith(500);
       });
 
-      it("logs that the API is insecure", function() {
-        expect(console.log).to.be.calledWithMatch("insecure connection");
-      });
-
-      it("sets @server to @express", function() {
-        expect(api.server).to.be.eql(api.express);
+      it('calls res#json to be called with', function() {
+        expect(res.json).to.be.calledWith({ error: 'An error occured.' });
       });
     });
   });
 
-  describe("#setupAuth", function() {
-    context("when auth.type is basic", function() {
-      beforeEach(function() {
-        api.auth = { type: "basic", user: "user", pass: "pass" };
-      });
-
-      it("returns a basic auth middleware function", function() {
-        var fn = api.setupAuth(),
-            req = new MockRequest(),
-            res = new MockResponse(),
-            next = spy();
-
-        var auth = "Basic " + new Buffer("user:pass").toString("base64");
-
-        req.headers.authorization = auth;
-
-        fn(req, res, next);
-        expect(next).to.be.called;
-      });
-    });
-
-    context("when auth is null", function() {
-      beforeEach(function() {
-        api.auth = null;
-      });
-
-      it("returns a pass-through middleware function", function() {
-        var fn = api.setupAuth(),
-            next = spy();
-
-        fn(null, null, next);
-        expect(next).to.be.called;
-      });
-    });
-  });
-
-  describe("#listen", function() {
+  describe('#listen', function() {
+    var server;
     beforeEach(function() {
-      // we create a plain HTTP server to avoid a log message from Node
-      api.ssl = false;
-      api.createServer();
-      api.express.set("title", "Cylon API Server");
+      server = {
+        listen: stub()
+      };
 
-      stub(api.server, "listen").yields();
+      stub(console, 'log');
+      server.listen.yields();
+
+      api.server = server;
+      api.express = { get: stub().returns('MyTitle') };
 
       api.listen();
     });
 
     afterEach(function() {
-      api.server.listen.restore();
+      console.log.restore();
     });
 
-    it("listens on the configured host and port", function() {
-      expect(api.server.listen).to.be.calledWith("3000", "127.0.0.1");
+    it('calls #server#listen with', function() {
+      expect(server.listen).to.be.calledOnce;
     });
 
-    context("when the server is running", function() {
-      it("logs that it's online and listening", function() {
-        var online = "Cylon API Server is now online.",
-            listening = "Listening at http://127.0.0.1:3000";
-
-        expect(console.log).to.be.calledWith(online);
-        expect(console.log).to.be.calledWith(listening);
-      });
+    it('triggers the anonymous function and writes to console ', function() {
+      var txt1 = 'Listening MyTitle @127.0.0.1:3000';
+      expect(console.log).to.be.calledWith('Cylon + Socket.io is now online.');
+      expect(console.log).to.be.calledWith(txt1);
     });
   });
- */
+
+
 });

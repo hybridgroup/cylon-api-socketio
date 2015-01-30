@@ -1,7 +1,7 @@
 {
   "name": "cylon-api-socketio",
   "version": "0.1.0",
-  "main": "lib/socketio-api.js",
+  "main": "lib/api.js",
   "description": "Socket.io API add-on module for Cylon.JS",
   "homepage": "http://cylonjs.com",
   "bugs": "https://github.com/hybridgroup/cylon-api-socketio/issues",
