@@ -1,13 +1,10 @@
 /* jshint expr:true */
 "use strict";
 
-//var https = require("https"),
-    //path = require("path");
-
 var API = source('api');
 
-// var http = ('http');
-//var SocketMaster = require('../../lib/socket-master.js');
+var http = require('http');
+// var SocketMaster = require('../../lib/socket-master.js');
 
 describe("Socket.io API", function() {
   var api;
@@ -159,5 +156,26 @@ describe("Socket.io API", function() {
     });
   });
 
+  describe('#_express', function() {
+    var exp;
 
+    beforeEach(function() {
+      exp = api._express();
+    });
+
+    it('calls express()', function() {
+      expect(exp).to.be.a('function');
+    });
+  });
+
+  describe('#_http', function() {
+    beforeEach(function() {
+      stub(http, 'Server');
+      api._http();
+    });
+
+    it('calls http#server', function() {
+      expect(http.Server).to.be.calledOnce;
+    });
+  });
 });
