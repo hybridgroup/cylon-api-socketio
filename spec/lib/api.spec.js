@@ -37,7 +37,7 @@ describe("Socket.io API", function() {
 
     it('sets opts to an {} if null is passed', function() {
       var api = new API();
-      expect(api.opts.mcp).to.be.undefined();
+      expect(api.mcp).to.be.undefined();
     });
   });
 
