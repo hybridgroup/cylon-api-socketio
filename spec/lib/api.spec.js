@@ -34,10 +34,37 @@ describe("Socket.io API", function() {
     it('sets @port', function() {
       expect(api.mcp).to.be.eql({ attr1: 'mcp' });
     });
+
+    it('sets opts to an {} if null is passed', function() {
+      var api = new API();
+      expect(api.opts.mcp).to.be.undefined();
+    });
+  });
+
+  describe('#start', function() {
+    beforeEach(function() {
+      stub(api, 'createServer');
+      stub(api, 'listen');
+
+      api.start();
+    });
+
+    afterEach(function() {
+      api.createServer.restore();
+      api.listen.restore();
+    });
+
+    it('calls #createServer', function() {
+      expect(api.createServer).to.be.calledOnce;
+    });
+
+    it('calls #listen', function() {
+      expect(api.listen).to.be.calledOnce;
+    });
   });
 
   describe('#createServer', function() {
-     var res, next, ins;
+    var res, next, ins;
 
     beforeEach(function() {
       ins = {
