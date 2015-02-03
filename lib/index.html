@@ -34,6 +34,49 @@
           // any of them and connect to their socket.
           robot = io('http://127.0.0.1/api/robots/' + robots[0]);
 
+          // Listen to the 'commands' event on device
+          // returns a list of available commands for the device
+          robot.on('commands', function(commands) {
+            var msg = 'Robot commands:' + commands.toString();
+            console.log('Robot commands ==>');
+            console.log(commands);
+            $('#messages').append($('<li>').text(msg));
+          });
+
+          // Every time a commands is executed the 'command' event
+          // is triggered, returns the name of the command executed
+          // and the value returned
+          robot.on('command', function(command, value) {
+            console.log('Robot command name ==>', command);
+            console.log('Robot command returned ==>', value);
+          });
+
+          // Listen to the 'events' event on device
+          // returns a list of available events for the device
+          robot.on('events', function(events) {
+            var msg = 'events:' + events.toString();
+            console.log('Robot events ==>');
+            console.log(events);
+            $('#messages').append($('<li>').text(msg));
+          });
+
+          // We emit 'commands' and 'events' so we can listen
+          // and get the lists of available items
+          robot.emit('commands');
+          robot.emit('events');
+
+          // Listen for robot specific events,
+          // this must be declared when defining a robot in
+          // cylon, check examples/robot/events.js for more
+          // details on how to setup robot listeners in the API.
+          robot.on('turned-on', function(){
+            console.log('THE ROBOT JUST TURNED ON ITS LED!!!');
+          });
+
+          robot.on('turned-off', function(){
+            console.log('THE ROBOT JUST TURNED OFF ITS LED!!!');
+          });
+
           // Similar to how the main api socket emits a robots event
           // with a list of available robots, but instead
           // emits 'devices' which sends back a list of
@@ -54,8 +97,8 @@
               // Listen to the 'commands' event on device
               // returns a list of available commands for the device
               device.on('commands', function(commands) {
-                var msg = 'commands:' + commands.toString();
-                console.log('commands ==>');
+                var msg = 'Device commands:' + commands.toString();
+                console.log('Device commands ==>');
                 console.log(commands);
                 $('#messages').append($('<li>').text(msg));
               });
@@ -64,15 +107,15 @@
               // is triggered, returns the name of the command executed
               // and the value returned
               device.on('command', function(command, value) {
-                console.log('command name ==>', command);
-                console.log('command returned ==>', value);
+                console.log('Device command name ==>', command);
+                console.log('Device command returned ==>', value);
               });
 
               // Listen to the 'events' event on device
               // returns a list of available events for the device
               device.on('events', function(events) {
-                var msg = 'events:' + events.toString();
-                console.log('events ==>');
+                var msg = 'Device events:' + events.toString();
+                console.log('Device events ==>');
                 console.log(events);
                 $('#messages').append($('<li>').text(msg));
               });
@@ -82,9 +125,9 @@
               device.emit('commands');
               device.emit('events');
 
-              setInterval(function() {
-                device.emit('toggle');
-              }, 1000);
+              //setInterval(function() {
+               // device.emit('toggle');
+              //}, 1000);
               /*
                 // There are two ways to send commands to a device,
                 // The first one (we preffer this one) is by emitting
