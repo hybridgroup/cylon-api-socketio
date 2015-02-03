@@ -34,6 +34,11 @@
           // any of them and connect to their socket.
           robot = io('http://127.0.0.1/api/robots/' + robots[0]);
 
+          // Listen to the 'message' event on device
+          robot.on('message', function(msg) {
+            $('#messages').append($('<li>').text(msg));
+          });
+
           // Listen to the 'commands' event on device
           // returns a list of available commands for the device
           robot.on('commands', function(commands) {
@@ -84,7 +89,7 @@
       });
 
       $('form').submit(function(){
-        device.emit('message', $('#m').val());
+        robot.emit('message', $('#m').val());
         $('#m').val('');
 
         return false;
