@@ -389,5 +389,13 @@ describe('SocketMaster', function() {
         'analogRead'
       );
     });
+
+    it('calls #_addDefaultListeners', function() {
+      expect(sm._addDefaultListeners).to.be.calledOnce;
+      expect(sm._addDefaultListeners).to.be.calledWith(
+        socket,
+        'rosie'
+      );
+    });
   });
 });
