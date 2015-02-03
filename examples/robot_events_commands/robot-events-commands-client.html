@@ -82,6 +82,13 @@
           robot.emit('commands');
           robot.emit('events');
 
+          // The "hello world" program of robotics, the
+          // blink and LED program, we just emit the command
+          // we want our robot to execute.
+          setInterval(function() {
+            robot.emit('toggle');
+          }, 1000);
+
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
 
           $('#messages').append($('<li>').text(msg));

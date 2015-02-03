@@ -240,7 +240,7 @@ describe('SocketMaster', function() {
 
       socket.on.yields({ command: 'turn_on', args: [] });
       stub(sm, '_socketItems');
-      stub(sm, '_addDefaultListeners');
+      spy(sm, '_addDefaultListeners');
 
       sm.nsp = {
         robots: {
@@ -294,6 +294,7 @@ describe('SocketMaster', function() {
       socket.on.yields({ command: 'turn_on', args: [] });
 
       stub(sm, '_socketItems');
+      spy(sm, '_addDefaultListeners');
 
       sm.nsp = {
         robots: {
@@ -318,6 +319,7 @@ describe('SocketMaster', function() {
 
     afterEach(function() {
       sm._socketItems.restore();
+      sm._addDefaultListeners.restore();
     });
 
     it('calls #_socketItems', function() {
@@ -394,7 +396,7 @@ describe('SocketMaster', function() {
       expect(sm._addDefaultListeners).to.be.calledOnce;
       expect(sm._addDefaultListeners).to.be.calledWith(
         socket,
-        'rosie'
+        'led'
       );
     });
   });

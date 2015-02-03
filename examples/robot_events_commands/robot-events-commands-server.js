@@ -15,6 +15,7 @@ Cylon.robot({
     return {
       turn_on: this.turnOn,
       turn_off: this.turnOff,
+      toggle: this.toggle
     };
   },
 
@@ -49,6 +50,15 @@ Cylon.robot({
   turnOff: function() {
     this.led.turnOff();
     this.emit('turned-off');
+  },
+
+  toggle: function() {
+    this.led.toggle();
+    if (this.led.isOn()) {
+      this.emit('turned-on');
+    } else {
+      this.emit('turned-off');
+    }
   }
 });
 

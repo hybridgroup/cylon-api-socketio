@@ -77,6 +77,13 @@
             console.log('THE ROBOT JUST TURNED OFF ITS LED!!!');
           });
 
+          // The "hello world" program of robotics, the
+          // blink and LED program, we just emit the command
+          // we want our robot to execute.
+          setInterval(function() {
+            robot.emit('toggle');
+          }, 1000);
+
           // Similar to how the main api socket emits a robots event
           // with a list of available robots, but instead
           // emits 'devices' which sends back a list of
