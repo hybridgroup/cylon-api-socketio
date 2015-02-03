@@ -18,6 +18,9 @@ describe('SocketMaster', function() {
               },
               events: ['analogRead']
             }
+          },
+          commands: {
+            turn_on: function() { return 1; }
           }
         },
         thelma: {
@@ -28,6 +31,9 @@ describe('SocketMaster', function() {
               },
               events: ['analogRead']
             }
+          },
+          commands: {
+            turn_on: function() { return 1; }
           }
         }
       }
@@ -232,8 +238,9 @@ describe('SocketMaster', function() {
         on: stub()
       };
 
-      socket.on.yields();
+      socket.on.yields({ command: 'turn_on', args: [] });
       stub(sm, '_socketItems');
+      stub(sm, '_addDefaultListeners');
 
       sm.nsp = {
         robots: {
@@ -251,6 +258,7 @@ describe('SocketMaster', function() {
 
     afterEach(function() {
       sm._socketItems.restore();
+      sm._addDefaultListeners.restore();
     });
 
     it('calls #_socketItems', function() {
@@ -264,11 +272,11 @@ describe('SocketMaster', function() {
       expect(socket.on).to.be.calledWith('devices');
     });
 
-    it('emits "devices" event', function() {
-      expect(sm.nsp.rosie.emit).to.be.calledTwice;
-      expect(sm.nsp.rosie.emit).to.be.calledWith(
-        'devices',
-        ['led']
+    it('calls #_addDefaultListeners', function() {
+      expect(sm._addDefaultListeners).to.be.calledOnce;
+      expect(sm._addDefaultListeners).to.be.calledWith(
+        socket,
+        'rosie'
       );
     });
   });
@@ -283,7 +291,7 @@ describe('SocketMaster', function() {
         on: stub()
       };
 
-      socket.on.yields({ command: 'turn_on', args: []});
+      socket.on.yields({ command: 'turn_on', args: [] });
 
       stub(sm, '_socketItems');
 
