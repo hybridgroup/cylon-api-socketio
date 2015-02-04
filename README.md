@@ -175,6 +175,8 @@ Thank you!
 
 ## Release History
 
+0.2.0 - Add support for robot commands and events
+
 0.1.0 - Initial release
 
 ## License
