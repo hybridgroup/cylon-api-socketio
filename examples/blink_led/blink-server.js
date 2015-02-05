@@ -1,31 +1,25 @@
-"use strict";
+'use strict';
 
-var Cylon = require("cylon");
+var Cylon = require('cylon');
 
-var bots = {
-  "rosie": "",
-};
+Cylon.robot({
+  name: 'rosie',
 
-Object.keys(bots).forEach(function(name) {
-  Cylon.robot({
-    name: name,
+  connections: {
+    arduino: { adaptor: 'firmata', port: '/dev/ttyACM0' }
+  },
 
-    connections: {
-      arduino: { adaptor: 'firmata', port: '/dev/ttyACM0' }
-    },
+  devices: {
+    led: { driver: 'led', pin: 13 }
+  },
 
-    devices: {
-      led: { driver: 'led', pin: 13 }
-    },
-
-    work: function() {
-      // Add your robot code here,
-      // for this example with sockets
-      // we are going to be interacting
-      // with the robot using the code in
-      // ./analog-read-client.html.
-    }
-  });
+  work: function() {
+    // Add your robot code here,
+    // for this example with sockets
+    // we are going to be interacting
+    // with the robot using the code in
+    // ./blink-client.html.
+  }
 });
 
 // ensure you install the API plugin first:
@@ -33,8 +27,8 @@ Object.keys(bots).forEach(function(name) {
 Cylon.api(
   'socketio',
   {
-  host: "0.0.0.0",
-  port: "3000"
+  host: '0.0.0.0',
+  port: '3000'
 });
 
 Cylon.start();
