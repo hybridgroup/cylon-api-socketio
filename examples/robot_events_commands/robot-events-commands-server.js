@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var Cylon = require("cylon");
+var Cylon = require('cylon');
 
 Cylon.robot({
   name: 'cybot',
@@ -67,8 +67,8 @@ Cylon.robot({
 Cylon.api(
   'socketio',
   {
-  host: "0.0.0.0",
-  port: "3000"
+  host: '0.0.0.0',
+  port: '3000'
 });
 
 Cylon.start();

@@ -30,7 +30,7 @@
   "newcap": true,
   "noarg": true,
   "nonew": true,
-  "quotmark": "true",
+  "quotmark": "single",
   "strict": true,
   "sub": true,
   "undef": true,
