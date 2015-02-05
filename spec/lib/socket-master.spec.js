@@ -1,5 +1,5 @@
  /* jshint expr:true */
-"use strict";
+'use strict';
 
 var SocketMaster = source('socket-master');
 
@@ -39,7 +39,7 @@ describe('SocketMaster', function() {
       }
     };
     sm = new SocketMaster({}, mcp);
-    stub(console, "log");
+    stub(console, 'log');
   });
 
   afterEach(function() {
