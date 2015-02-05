@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+  <meta charset="utf-8">
   <head>
     <title>Socket.IO chat</title>
     <style>
@@ -20,7 +21,7 @@
 
     window.onload = function() {
       // Connect to the main api socket
-      cylon = io('http://127.0.0.1/api/robots');
+      cylon = io('http://127.0.0.1:3000/api/robots');
 
       console.log('Setting up socket connections:');
 
@@ -32,7 +33,7 @@
 
           // Once we have a list of available robots we can use
           // any of them and connect to their socket.
-          robot = io('http://127.0.0.1/api/robots/' + robots[0]);
+          robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
 
           // Listen to the 'message' event on device
           robot.on('message', function(msg) {

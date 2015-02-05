@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+  <meta charset="utf-8">
   <head>
     <title>Socket.IO chat</title>
     <style>
@@ -20,7 +21,7 @@
 
     window.onload = function() {
       // Connect to the main api socket
-      cylon = io('http://127.0.0.1/api/robots');
+      cylon = io('http://127.0.0.1:3000/api/robots');
 
       console.log('Setting up socket connections:');
 
@@ -32,7 +33,7 @@
 
           // Once we have a list of available robots we can use
           // any of them and connect to their socket.
-          robot = io('http://127.0.0.1/api/robots/' + robots[0]);
+          robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
 
           // Similar to how the main api socket emits a robots event
           // with a list of available robots, but instead
@@ -44,7 +45,7 @@
               // Same as with robots we use the list of devices to connect to them
               // in this case we already know which device we want to connect to,
               // so we create a new socket for `asensor` device.
-              device = io('http://127.0.0.1' + robot.nsp + '/devices/led');
+              device = io('http://127.0.0.1:3000' + robot.nsp + '/devices/led');
 
               // Listen to the 'message' event on device
               device.on('message', function(msg) {
@@ -113,32 +114,6 @@
 
                 // They do pretty much the same just different syntax sugar
               */
-            }
-          });
-
-          msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
-
-          $('#messages').append($('<li>').text(msg));
-        }
-      });
-
-      $('form').submit(function(){
-        device.emit('message', $('#m').val());
-        $('#m').val('');
-
-        return false;
-      });
-    };
-  </script>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-  </body>
-</html>
-
-              
             }
           });
 
