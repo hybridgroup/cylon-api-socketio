@@ -1,24 +1,24 @@
 /* jshint expr:true */
-"use strict";
+'use strict';
 
 var API = source('api');
 
 var http = require('http');
 // var SocketMaster = require('../../lib/socket-master.js');
 
-describe("Socket.io API", function() {
+describe('Socket.io API', function() {
   var api;
 
   beforeEach(function() {
     api = new API({ mcp: { attr1: 'mcp' } });
-    //stub(console, "log");
+    stub(console, 'log');
   });
 
   afterEach(function() {
-    //console.log.restore();
+    console.log.restore();
   });
 
-  describe("#constructor", function() {
+  describe('#constructor', function() {
     it('sets @name', function() {
       expect(api.name).to.be.eql('socketio');
     });
@@ -74,19 +74,25 @@ describe("Socket.io API", function() {
       };
 
       stub(api, '_express').returns(ins);
-      stub(api, '_newSM').returns({ start: spy() });
+      stub(api, '_newSM').returns({
+        start: spy(),
+        io: {
+          set: spy()
+        }
+      });
       stub(api, '_http').returns({});
 
       res = {
         sendFile: spy(),
         status: spy(),
-        json: spy()
+        json: spy(),
+        header: spy()
       };
 
       next = spy();
 
       ins.get.yields(null, res);
-      ins.use.yields({}, null, res, next);
+      ins.use.yields({ err: 500 }, res, next);
 
       api.createServer();
     });
@@ -134,12 +140,9 @@ describe("Socket.io API", function() {
     });
 
     it('calls #express#use', function() {
-      expect(api.express.use).to.be.calledOnce;
+      expect(api.express.use).to.be.calledTwice;
     });
 
-    it('calls #express#use ', function() {
-      expect(api.express.use).to.be.calledOnce;
-    });
 
     describe('#express#use', function() {
       it('calls res#status with 500', function() {
@@ -159,7 +162,6 @@ describe("Socket.io API", function() {
         listen: stub()
       };
 
-      stub(console, 'log');
       server.listen.yields();
 
       api.server = server;
@@ -169,7 +171,6 @@ describe("Socket.io API", function() {
     });
 
     afterEach(function() {
-      console.log.restore();
     });
 
     it('calls #server#listen with', function() {
