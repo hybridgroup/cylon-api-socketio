@@ -175,6 +175,8 @@ Thank you!
 
 ## Release History
 
+0.2.1 - Fixes api.server.listen undefined issue
+
 0.2.1 - Update examples to fix an issue with CORS
 
 0.2.0 - Add support for robot commands and events
