@@ -3,8 +3,7 @@ sudo: false
 node_js: '0.10'
 
 before_install:
-  # - "mkdir ~/.npm"
-
+  - "mkdir -p ~/.npm"
 before_script:
   - npm install -g istanbul jshint codeclimate-test-reporter
 
