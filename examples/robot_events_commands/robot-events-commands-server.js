@@ -67,8 +67,10 @@ Cylon.robot({
 Cylon.api(
   'socketio',
   {
-  host: '0.0.0.0',
-  port: '3000'
-});
+    host: '0.0.0.0',
+    port: '3000',
+    options: {} // Options for socket.io
+  }
+);
 
 Cylon.start();
