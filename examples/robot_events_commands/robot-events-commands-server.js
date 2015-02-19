@@ -6,7 +6,7 @@ Cylon.robot({
   name: 'cybot',
 
   // These are the events that will be registered in the API
-  events: ['turned-on', 'turned-off'],
+  events: ['turned_on', 'turned_off'],
 
   // These are the commands that will be availble in the API
   // Commands method needs to return an object with the aliases
@@ -44,20 +44,20 @@ Cylon.robot({
 
   turnOn: function() {
     this.led.turnOn();
-    this.emit('turned-on');
+    this.emit('turned_on', { data: 'pass some data to the listener'});
   },
 
   turnOff: function() {
     this.led.turnOff();
-    this.emit('turned-off');
+    this.emit('turned_off', { data: 'pass some data to the listener'});
   },
 
   toggle: function() {
     this.led.toggle();
     if (this.led.isOn()) {
-      this.emit('turned-on');
+      this.emit('turned_on', { data: 'pass some data to the listener'});
     } else {
-      this.emit('turned-off');
+      this.emit('turned_off', { data: 'pass some data to the listener'});
     }
   }
 });
