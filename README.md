@@ -175,7 +175,9 @@ Thank you!
 
 ## Release History
 
-0.2.1 - Fixes api.server.listen undefined issue
+0.2.3 - Changes for latest Cylon release v0.22.1
+
+0.2.2 - Fixes api.server.listen undefined issue
 
 0.2.1 - Update examples to fix an issue with CORS
 
