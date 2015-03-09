@@ -19,7 +19,7 @@ https://github.com/hybridgroup/cylon
 ## How to install
 
 ```bash
-$ npm install cylon-api-socketio
+$ npm install cylon cylon-api-socketio
 ```
 
 ## How to use
