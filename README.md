@@ -16,13 +16,13 @@ https://github.com/hybridgroup/cylon
 [![Code Climate](https://codeclimate.com/github/hybridgroup/cylon-api-socketio/badges/gpa.svg)](https://codeclimate.com/github/hybridgroup/cylon-api-socketio)
 [![Test Coverage](https://codeclimate.com/github/hybridgroup/cylon-api-socketio/badges/coverage.svg)](https://codeclimate.com/github/hybridgroup/cylon-api-socketio)
 
-## How to install
+## How to Install
 
 ```bash
 $ npm install cylon cylon-api-socketio
 ```
 
-## How to use
+## How to Use
 
 Make sure you have Cylon.js installed, then we can add Socket.io support to cylon
 programs as follows:
