@@ -35,7 +35,8 @@
           // any of them and connect to their socket.
           robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
 
-	        robot.on('message', function(msg) {
+	  / Listen to the 'message' event on device
+          robot.on('message', function(msg) {
             $('#messages').append($('<li>').text(msg));
           });
 
@@ -81,13 +82,34 @@
             console.log('TURNED_OFF!!!');
           });
 
-          // The "hello world" program of robotics, the
-          // blink and LED program, we just emit the command
-          // we want our device to execute.
-          setInterval(function() {
-            device.emit('toggle');
-          }, 1000);
+          // Similar to how the main api socket emits a robots event
+          // with a list of available robots, but instead
+          // emits 'devices' which sends back a list of
+          // available devices.
+          robot.on('devices', function(devices) {
+            if (!device) {
+            
+              /*
+                // There are two ways to send commands to a device,
+                // The first one (we preffer this one) is by emitting
+                // an event using the name of the command for the event,
+                // and passing the args as regular function args.
+                device.emit('turn_on', 'arg1', 'arg2', 'arg3')
 
+                // In the second one you emit a 'command' event and
+                // pass the command specifics inside an object.
+                device.emit(
+                  'command',
+                  {
+                    command: 'turn_on',
+                    args: ['arg1', 'arg2', 'arg3']
+                  }
+                )'
+
+                // They do pretty much the same just different syntax sugar
+              */
+            }
+          });
 
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
 
