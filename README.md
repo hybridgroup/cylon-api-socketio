@@ -28,9 +28,7 @@ Make sure you have Cylon.js installed, then we can add Socket.io support to cylo
 programs as follows:
 
 ```javascript
-"use strict";
-
-var Cylon = require("cylon");
+var Cylon = require('cylon');
 
 Cylon.robot({
   name: 'rosie',
@@ -43,22 +41,50 @@ Cylon.robot({
     led: { driver: 'led', pin: 13 }
   },
 
+  events: ['turned_on', 'turned_off', 'toggle'],
+
+  commands: function() {
+    return {
+      turn_on: this.turnOn,
+      turn_off: this.turnOff,
+      toggle: this.toggle
+    };
+  },
+
+  toggle: function() {
+    this.led.toggle();
+    if (this.led.isOn()) {
+      this.emit('turned_on', { data: 'pass some data to the listener'});
+    } else {
+      this.emit('turned_off', { data: 'pass some data to the listener'});
+    }
+  },
+
+  turnOn: function() {
+    this.led.turnOn();
+    this.emit('turned_on', { data: 'pass some data to the listener'});
+  },
+
+  turnOff: function() {
+    this.led.turnOff();
+    this.emit('turned_off', { data: 'pass some data to the listener'});
+  },
+
   work: function() {
     // Add your robot code here,
     // for this example with sockets
     // we are going to be interacting
     // with the robot using the code in
-    // ./analog-read-client.html.
+    // ./**-client.html
   }
 });
 
 // ensure you install the API plugin first:
 // $ npm install cylon-api-socket-io
 Cylon.api(
-  'socketio',
-  {
-  host: "0.0.0.0",
-  port: "3000"
+  'socketio',{
+  host: '0.0.0.0',
+  port: '3000'
 });
 
 Cylon.start();
@@ -66,14 +92,14 @@ Cylon.start();
 
 ## How to Connect
 
-Once you have added the api to your Cylon.js code, and your robots are up and running, you can connect
-to them using Socket.io through cylon using the following code:
+Once you have added the api to your Cylon.js code, and your robots are up and running, you can connect to them using Socket.io using the following code:
 
 ```html
 <!doctype html>
 <html>
+  <meta charset="utf-8">
   <head>
-    <title>Socket.IO chat</title>
+    <title>Example For Robot Generic Message Event</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -88,67 +114,42 @@ to them using Socket.io through cylon using the following code:
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script type="text/javascript">
-    var cylon, robot, device;
+    var robot;
 
     window.onload = function() {
-      if (!device) {
-        // Since we already know which device we want to connect to,
-        // we create a new socket for the `led` device.
-        device = io('http://127.0.0.1/api/robots/rosie/devices/led');
+      console.log('Setting up socket connections:');
 
-        // Listen to the 'message' event on device
-        device.on('message', function(msg) {
-          $('#messages').append($('<li>').text(msg));
-        });
+      // Once we have a list of available robots we can use
+      // any of them and connect to their socket.
+      robot = io('http://127.0.0.1:3000/api/robots/rosie');
 
-        // Listen to the 'commands' event on device
-        // returns a list of available commands for the device,
-        // you need to first send a 'commands' event down
-        // the socket, so it knows to trigger this event
-        // with the list of commands.
-        device.on('commands', function(commands) {
-          var msg = 'commands:' + commands.toString();
-          console.log('commands ==>', commands);
-          $('#messages').append($('<li>').text(msg));
-        });
+      robot.on('message', function(payload) {
+        console.log('On Robot');
+        console.log('  Event:', payload.event);
+        console.log('  Data:', payload.data);
+        $('#messages').append($('<li>').text('On Robot:'));
+        $('#messages').append($('<li>').text('event:' + payload.event.toString()));
+        if (!!payload.data) {
+          $('#messages').append($('<li>').text('data:' + payload.data.toString()));
+        }
+        $('#messages').append($('<hr />'));
+      });
 
-        // Every time a command is executed the 'command' event
-        // is triggered, returns the name of the command executed
-        // and the value returned by the method the command calls.
-        device.on('command', function(command, value) {
-          console.log('command name ==>', command);
-          console.log('command returned ==>', value);
-        });
+      setTimeout(function() {
+        robot.emit('toggle');
+      }, 5000);
 
-        // Listen to the 'events' event on device
-        // returns a list of available events for the device,
-        // same as with commands you need to emit a 'events'
-        // event first.
-        device.on('events', function(events) {
-          var msg = 'events:' + events.toString();
-          console.log('events ==>', events);
-          $('#messages').append($('<li>').text(msg));
-        });
+      robot.emit('commands');
+      robot.emit('events');
+      robot.emit('turn_on');
 
-        // We emit 'commands' and 'events' so we can listen
-        // and get the lists of available items.
-        device.emit('commands');
-        device.emit('events');
+      msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
 
-        // The "hello world" program of robotics, the
-        // blink and LED program, we just emit the command
-        // we want our device to execute.
-        setInterval(function() {
-          device.emit('toggle');
-        }, 1000);
-      }
+      $('#messages').append($('<li>').text(msg));
     };
   </script>
   <body>
     <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
   </body>
 </html>
 ```
