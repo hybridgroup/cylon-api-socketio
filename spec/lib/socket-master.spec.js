@@ -16,7 +16,8 @@ describe('SocketMaster', function() {
               commands: {
                 turn_on: function() { return 1; }
               },
-              events: ['analogRead']
+              events: ['turn_on'],
+              listeners: function() { return []; }
             }
           },
           commands: {
@@ -282,7 +283,7 @@ describe('SocketMaster', function() {
   });
 
   describe('#socketDevices', function() {
-    var callback, socket, asensor;
+    var callback, socket, led;
 
     beforeEach(function() {
       callback = spy();
@@ -308,9 +309,9 @@ describe('SocketMaster', function() {
         },
       };
 
-      asensor = mcp.robots.rosie.devices.led;
-      asensor.on = stub();
-      asensor.on.yields();
+      led = mcp.robots.rosie.devices.led;
+      led.on = stub();
+      led.on.yields();
 
       sm._socketItems.yields(socket, 'led', mcp.robots.rosie.devices.led);
 
@@ -363,11 +364,10 @@ describe('SocketMaster', function() {
       expect(socket.on).to.be.calledWith('command');
     });
 
-    it('emits "events" event', function() {
+    it('emits "command" event with (command, turn_on, 1)', function() {
       expect(sm.nsp.led.emit).to.be.calledWith(
         'command',
-        'turn_on',
-        1
+        { command: 'turn_on', returned: 1 }
       );
     });
 
@@ -382,13 +382,13 @@ describe('SocketMaster', function() {
       );
     });
 
-    it('adds a listener for "analogRead" to the device', function() {
-      expect(asensor.on).to.be.calledWith('analogRead');
+    it('adds a listener for "turn_on" to the device', function() {
+      expect(led.on).to.be.calledWith('turn_on');
     });
 
     it('emits "events" event', function() {
       expect(sm.nsp.led.emit).to.be.calledWith(
-        'analogRead'
+        'turn_on'
       );
     });
 
