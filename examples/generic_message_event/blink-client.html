@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script type="text/javascript">
+    var cylon, robot, device;
+
+    window.onload = function() {
+      // Connect to the main api socket
+      cylon = io('http://127.0.0.1:3000/api/robots');
+
+      console.log('Setting up socket connections:');
+
+      // On connection the 'robots' event is emitted
+      // and returns a list of available robots.
+      cylon.on('robots', function(robots) {
+        if (!robot) {
+          console.log('List of robots:', robots);
+
+          // Once we have a list of available robots we can use
+          // any of them and connect to their socket.
+          robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
+
+          robot.on('message', function(payload) {
+            console.log('On Robot');
+            console.log('  Event:', payload.event);
+            console.log('  Data:', payload.data);
+            $('#messages').append($('<li>').text('event:' + payload.event.toString()));
+            if (!!payload.data) {
+              $('#messages').append($('<li>').text('data:' + payload.data.toString()));
+            }
+          });
+
+          setTimeout(function() {
+            robot.emit('toggle');
+          }, 5000);
+
+          // We use the robot nsp (namespace) to connect to one of the devices
+          // in this case the led we added in our cylon robot code
+          device = io('http://127.0.0.1:3000' + robot.nsp + '/devices/led');
+
+          device.on('commands', function(commands) {
+            console.log('Device Commands:', commands);
+          });
+
+          device.on('events', function(events) {
+            console.log('Device events:', events);
+          });
+
+          device.on('message', function(payload) {
+            console.log('On Device');
+            console.log('  Event:', payload.event);
+            console.log('  Data:', payload.data);
+            $('#messages').append($('<li>').text('On Device:'));
+            $('#messages').append($('<li>').text('  Event:' + payload.event.toString()));
+            if (!!payload.data) {
+              $('#messages').append($('<li>').text('  Data:' + payload.data.toString()));
+            }
+          });
+
+          device.emit('commands');
+          device.emit('events');
+          device.emit('turn_on');
+
+          msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
+
+          $('#messages').append($('<li>').text(msg));
+        }
+      });
+    };
+  </script>
+  <body>
+    <ul id="messages"></ul>
+  </body>
+</html>
