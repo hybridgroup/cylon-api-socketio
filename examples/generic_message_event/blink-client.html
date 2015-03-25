@@ -39,10 +39,12 @@
             console.log('On Robot');
             console.log('  Event:', payload.event);
             console.log('  Data:', payload.data);
+            $('#messages').append($('<li>').text('On Robot:'));
             $('#messages').append($('<li>').text('event:' + payload.event.toString()));
             if (!!payload.data) {
               $('#messages').append($('<li>').text('data:' + payload.data.toString()));
             }
+            $('#messages').append($('<hr />'));
           });
 
           setTimeout(function() {
@@ -70,6 +72,7 @@
             if (!!payload.data) {
               $('#messages').append($('<li>').text('  Data:' + payload.data.toString()));
             }
+            $('#messages').append($('<hr />'));
           });
 
           device.emit('commands');
