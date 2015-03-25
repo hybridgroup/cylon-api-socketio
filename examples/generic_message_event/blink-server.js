@@ -5,14 +5,22 @@ var Cylon = require('cylon');
 Cylon.robot({
   name: 'rosie',
 
-  events: ['turned_on', 'turned_off', 'toggle'],
-
   connections: {
     arduino: { adaptor: 'firmata', port: '/dev/ttyACM0' }
   },
 
   devices: {
     led: { driver: 'led', pin: 13 }
+  },
+
+  events: ['turned_on', 'turned_off', 'toggle'],
+
+  commands: function() {
+    return {
+      turn_on: this.turnOn,
+      turn_off: this.turnOff,
+      toggle: this.toggle
+    };
   },
 
   toggle: function() {
@@ -39,7 +47,7 @@ Cylon.robot({
     // for this example with sockets
     // we are going to be interacting
     // with the robot using the code in
-    // ./blink-client.html.
+    // ./**-client.html
   }
 });
 
