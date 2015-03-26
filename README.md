@@ -71,7 +71,7 @@ Once you have added the api to your Cylon.js code, and your robots are up and ru
 <html>
   <meta charset="utf-8">
   <head>
-    <title>Exmaple For Device Generic Message Event</title>
+    <title>Simple Device Example</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
