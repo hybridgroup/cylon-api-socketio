@@ -1,13 +1,11 @@
 # Cylon.js API Plugin For Socket.io
 
-API plugins were stripped from Cylon.js main module, to make everything more modular
-and at the same time make Cylon.js lighter, we now have two API plugins
-for different protocols, the one in this repo `cylon-api-socketio` and
-[cylon-api-http](http://github.com/hybridgroup/cylon-api-http).
-
 Cylon.js (http://cylonjs.com) is a JavaScript framework for robotics, physical computing, and the Internet of Things using Node.js
 
-This repository contains the Cylon API plugin for Socket.io
+API plugins are separate from the Cylon.js main module, to make everything more modular
+and at the same time make Cylon.js lighter.
+
+This repository contains the Cylon API plugin for [Socket.io](http://socket.io/)
 
 For more information about Cylon, check out the repo at
 https://github.com/hybridgroup/cylon
