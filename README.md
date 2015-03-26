@@ -28,6 +28,8 @@ Make sure you have Cylon.js installed, then we can add Socket.io support to cylo
 programs as follows:
 
 ```javascript
+'use strict';
+
 var Cylon = require('cylon');
 
 Cylon.robot({
@@ -41,37 +43,7 @@ Cylon.robot({
     led: { driver: 'led', pin: 13 }
   },
 
-  events: ['turned_on', 'turned_off', 'toggle'],
-
-  commands: function() {
-    return {
-      turn_on: this.turnOn,
-      turn_off: this.turnOff,
-      toggle: this.toggle
-    };
-  },
-
-  toggle: function() {
-    this.led.toggle();
-    if (this.led.isOn()) {
-      this.emit('turned_on', { data: 'pass some data to the listener'});
-    } else {
-      this.emit('turned_off', { data: 'pass some data to the listener'});
-    }
-  },
-
-  turnOn: function() {
-    this.led.turnOn();
-    this.emit('turned_on', { data: 'pass some data to the listener'});
-  },
-
-  turnOff: function() {
-    this.led.turnOff();
-    this.emit('turned_off', { data: 'pass some data to the listener'});
-  },
-
   work: function() {
-    // Add your robot code here,
     // for this example with sockets
     // we are going to be interacting
     // with the robot using the code in
@@ -81,8 +53,8 @@ Cylon.robot({
 
 // ensure you install the API plugin first:
 // $ npm install cylon-api-socket-io
-Cylon.api(
-  'socketio',{
+Cylon.api('socketio',
+{
   host: '0.0.0.0',
   port: '3000'
 });
@@ -99,7 +71,7 @@ Once you have added the api to your Cylon.js code, and your robots are up and ru
 <html>
   <meta charset="utf-8">
   <head>
-    <title>Example For Robot Generic Message Event</title>
+    <title>Exmaple For Device Generic Message Event</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -114,36 +86,31 @@ Once you have added the api to your Cylon.js code, and your robots are up and ru
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
   <script type="text/javascript">
-    var robot;
+    var device;
 
     window.onload = function() {
       console.log('Setting up socket connections:');
 
-      // Once we have a list of available robots we can use
-      // any of them and connect to their socket.
-      robot = io('http://127.0.0.1:3000/api/robots/rosie');
+      // We use the robot nsp (namespace) to connect to one of the devices
+      // in this case the led we added in our cylon robot code
+      device = io('http://127.0.0.1:3000/api/robots/rosie/devices/led');
+      setInterval(function() {
+        device.emit('toggle');
+      }, 1000);
 
-      robot.on('message', function(payload) {
-        console.log('On Robot');
+      device.on('message', function(payload) {
+        console.log('On Device');
         console.log('  Event:', payload.event);
         console.log('  Data:', payload.data);
-        $('#messages').append($('<li>').text('On Robot:'));
-        $('#messages').append($('<li>').text('event:' + payload.event.toString()));
+        $('#messages').append($('<li>').text('On Device:'));
+        $('#messages').append($('<li>').text('  Event:' + payload.event.toString()));
         if (!!payload.data) {
-          $('#messages').append($('<li>').text('data:' + payload.data.toString()));
+          $('#messages').append($('<li>').text('  Data:' + payload.data.toString()));
         }
         $('#messages').append($('<hr />'));
       });
 
-      setTimeout(function() {
-        robot.emit('toggle');
-      }, 5000);
-
-      robot.emit('commands');
-      robot.emit('events');
-      robot.emit('turn_on');
-
-      msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
+      msg = 'You have been subscribed to Cylon sockets:' + device.nsp;
 
       $('#messages').append($('<li>').text(msg));
     };
