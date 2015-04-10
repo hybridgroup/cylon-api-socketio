@@ -4,7 +4,6 @@
 var API = source('api');
 
 var http = require('http');
-// var SocketMaster = require('../../lib/socket-master.js');
 
 describe('Socket.io API', function() {
   var api;
@@ -41,173 +40,88 @@ describe('Socket.io API', function() {
     });
   });
 
-  /*
   describe('#start', function() {
     beforeEach(function() {
-      stub(api, 'createServer');
-      stub(api, 'listen');
+      api.createServer = stub();
+      api.listen = stub();
 
       api.start();
     });
 
-    afterEach(function() {
-      api.createServer.restore();
-      api.listen.restore();
-    });
-
     it('calls #createServer', function() {
-      expect(api.createServer).to.be.calledOnce;
+      expect(api.createServer).to.be.called;
     });
 
     it('calls #listen', function() {
-      expect(api.listen).to.be.calledOnce;
+      expect(api.listen).to.be.called;
     });
   });
-  */
 
   describe('#createServer', function() {
-    var res, next, ins;
+    var server, sm;
 
     beforeEach(function() {
-      ins = {
-        set: stub(),
-        get: stub(),
-        use: stub()
-      };
+      server = {};
+      sm = {};
 
-      stub(api, '_express').returns(ins);
-      stub(api, '_newSM').returns({
-        start: spy(),
-        io: {
-          set: spy()
-        }
-      });
-      stub(api, '_http').returns({});
+      stub(http, 'createServer').returns(server);
 
-      res = {
-        sendFile: spy(),
-        status: spy(),
-        json: spy(),
-        header: spy()
-      };
-
-      next = spy();
-
-      ins.get.yields(null, res);
-      ins.use.yields({ err: 500 }, res, next);
+      api._newSM = stub().returns(sm);
 
       api.createServer();
     });
 
     afterEach(function() {
-      api._newSM.restore();
-      api._express.restore();
+      http.createServer.restore();
     });
 
-    it('sets @express', function() {
-      expect(api.express).to.not.be.undefined();
+    it('creates a new HTTP server', function() {
+      expect(http.createServer).to.be.called;
+
+      expect(api.server).to.be.eql(server);
+      expect(api.http).to.be.eql(server);
     });
 
-    it('sets @server', function() {
-      expect(api.server).to.not.be.undefined();
-    });
-
-    it('sets @http', function() {
-      expect(api.http).to.not.be.undefined();
-    });
-
-    it('calls #_newSM', function() {
-      expect(api._newSM).to.be.calledOnce;
-    });
-
-    it('sets #sm', function() {
-      expect(api.sm).to.not.be.undefined();
-    });
-
-    it('calls #sm#start', function() {
-      expect(api.sm.start).to.be.calledOnce;
-    });
-
-    it('calls #express#set with', function() {
-      var txt = 'Cylon Socket.io API Server';
-      expect(api.express.set).to.be.calledWith('title', txt);
-    });
-
-    it('calls #express#get with', function() {
-      expect(api.express.get).to.be.calledWith('/');
-    });
-
-    it('calls #express#get to trigger a callback and call', function() {
-      expect(res.sendFile).to.be.calledOnce;
-    });
-
-    it('calls #express#use', function() {
-      expect(api.express.use).to.be.calledTwice;
-    });
-
-
-    describe('#express#use', function() {
-      it('calls res#status with 500', function() {
-        expect(res.status).to.be.calledWith(500);
-      });
-
-      it('calls res#json to be called with', function() {
-        expect(res.json).to.be.calledWith({ error: 'An error occured.' });
-      });
+    it('creates a new SocketMaster', function() {
+      expect(api._newSM).to.be.called;
+      expect(api.sm).to.be.eql(sm);
     });
   });
 
   describe('#listen', function() {
-    var server;
     beforeEach(function() {
-      server = {
-        listen: stub()
+      api.server = { listen: stub() };
+
+      api.sm = {
+        start: stub(),
+        io: { set: stub() }
       };
-
-      server.listen.yields();
-
-      api.server = server;
-      stub(api, 'createServer');
-      api.express = { get: stub().returns('MyTitle') };
 
       api.listen();
     });
 
-    afterEach(function() {
-      api.createServer.restore();
+    it('tells the HTTP server to start listening', function() {
+      expect(api.server.listen).to.be.calledWith(api.port);
     });
 
-    it('calls #server#listen with', function() {
-      expect(server.listen).to.be.calledOnce;
-    });
+    context('when the server has initialized', function() {
+      beforeEach(function() {
+        api.server.listen.yield();
+      });
 
-    it('triggers the anonymous function and writes to console ', function() {
-      var txt1 = 'Listening MyTitle @127.0.0.1:3000';
-      expect(console.log).to.be.calledWith('Cylon + Socket.io is now online.');
-      expect(console.log).to.be.calledWith(txt1);
-    });
-  });
+      it('starts the socketmaster', function() {
+        expect(api.sm.start).to.be.called;
+      });
 
-  describe('#_express', function() {
-    var exp;
+      it('sets a CORS policy for the socketmaster', function() {
+        expect(api.sm.io.set).to.be.calledWith('origins', api.CORS);
+      });
 
-    beforeEach(function() {
-      exp = api._express();
-    });
-
-    it('calls express()', function() {
-      expect(exp).to.be.a('function');
-    });
-  });
-
-  describe('#_http', function() {
-    beforeEach(function() {
-      stub(http, 'Server');
-      api._http();
-    });
-
-    it('calls http#server', function() {
-      expect(http.Server).to.be.calledOnce;
+      it('logs when it has started', function() {
+        expect(console.log).to.be.calledWith(
+          'SocketIO server listening at 127.0.0.1:3000'
+        );
+      });
     });
   });
 });
