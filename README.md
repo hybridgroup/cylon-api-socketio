@@ -141,6 +141,8 @@ Thank you!
 
 ## Release History
 
+0.3.0 - Remove Express, code refactoring
+
 0.2.5 - Correct examples
 
 0.2.4 - Fix issue with npm module release
