@@ -1,16 +1,12 @@
 'use strict';
 
-var sinon = require('sinon'),
-    spy = sinon.spy,
-    stub = sinon.stub;
-
 // A mock version of the http.ClientRequest class
-var MockRequest = module.exports = function MockRequest(opts) {
+module.exports = function MockRequest(opts) {
   if (opts == null) {
     opts = {};
   }
 
-  this.url = "/";
+  this.url = '/';
 
   this.headers = {};
 

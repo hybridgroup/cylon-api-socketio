@@ -1,7 +1,6 @@
- /* jshint expr:true */
 'use strict';
 
-var SocketMaster = source('socket-master');
+var SocketMaster = lib('socket-master');
 
 describe('SocketMaster', function() {
   var sm, mcp;
@@ -179,11 +178,9 @@ describe('SocketMaster', function() {
   });
 
   describe('#socketMCP', function() {
-    var callback, socket;
+    var socket;
 
     beforeEach(function() {
-      callback = spy();
-
       socket = {
         on: stub()
       };
@@ -230,11 +227,9 @@ describe('SocketMaster', function() {
   });
 
   describe('#socketRobots', function() {
-    var callback, socket;
+    var socket;
 
     beforeEach(function() {
-      callback = spy();
-
       socket = {
         on: stub()
       };
@@ -283,11 +278,9 @@ describe('SocketMaster', function() {
   });
 
   describe('#socketDevices', function() {
-    var callback, socket, led;
+    var socket, led;
 
     beforeEach(function() {
-      callback = spy();
-
       socket = {
         on: stub()
       };

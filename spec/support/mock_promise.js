@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var MockPromise = module.exports = function MockPromise() {
   this.deferred = this;
