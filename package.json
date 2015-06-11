@@ -17,7 +17,19 @@
     "url": "https://github.com/hybridgroup/cylon-api-socketio"
   },
 
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
+
+  "keywords": [
+    "cylon",
+    "cylonjs",
+    "cylons",
+    "robot",
+    "robots",
+    "robotics",
+    "iot",
+    "api",
+    "socketio"
+  ],
 
   "devDependencies": {
     "sinon-chai": "2.6.0",
