@@ -93,7 +93,24 @@ Once you have added the api to your Cylon.js code, and your robots are up and ru
       // in this case the led we added in our cylon robot code
       device = io('http://127.0.0.1:3000/api/robots/rosie/devices/led');
       setInterval(function() {
+        // There are two ways to send commands to a device,
+        // The first one (we preffer this one) is by emitting
+        // an event using the name of the command for the event,
+        // and passing the params as regular function args.
+        // eg. device.emit('angle', 180[, param2, param3, ...]);
         device.emit('toggle');
+
+        /*
+        // In the second one you emit a 'command' event and
+        // pass the command specifics inside an object.
+        device.emit(
+          'command',
+          {
+            command: 'angle',
+            args: [180, 'arg2', 'arg3']
+          }
+        );'
+        */
       }, 1000);
 
       device.on('message', function(payload) {
