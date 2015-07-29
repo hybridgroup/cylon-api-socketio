@@ -7,6 +7,7 @@ describe('SocketMaster', function() {
 
   beforeEach(function() {
     mcp = {
+      toJSON: spy(),
       robots: {
         rosie: {
           name: 'rosie',
@@ -158,13 +159,13 @@ describe('SocketMaster', function() {
     });
 
     it('sets nsps for all robots', function() {
-      expect(sm.nsp.rosie).to.be.eql(nsp);
-      expect(sm.nsp.thelma).to.be.eql(nsp);
+      expect(sm.nsp['/api/robots/rosie']).to.be.eql(nsp);
+      expect(sm.nsp['/api/robots/thelma']).to.be.eql(nsp);
     });
 
     it('sets listeners for "connection" event on nsps', function() {
-      expect(sm.nsp.rosie.on).to.be.calledWith('connection');
-      expect(sm.nsp.thelma.on).to.be.calledWith('connection');
+      expect(sm.nsp['/api/robots/rosie'].on).to.be.calledWith('connection');
+      expect(sm.nsp['/api/robots/thelma'].on).to.be.calledWith('connection');
     });
 
     it('sets listeners for socket "disconnect" event', function() {
@@ -172,8 +173,10 @@ describe('SocketMaster', function() {
     });
 
     it('triggers the callback', function() {
-      expect(callback).to.be.calledWith(socket, 'rosie', mcp.robots.rosie);
-      expect(callback).to.be.calledWith(socket, 'thelma', mcp.robots.thelma);
+      expect(callback).to.be.calledWith(
+          socket, '/api/robots/rosie', mcp.robots.rosie);
+      expect(callback).to.be.calledWith(
+          socket, '/api/robots/thelma', mcp.robots.thelma);
     });
   });
 
@@ -186,18 +189,22 @@ describe('SocketMaster', function() {
       };
 
       socket.on.yields();
+
       stub(sm, '_socketItems');
 
       sm.nsp = {
-        robots: {
+        '/': {
           emit: stub()
         },
-        rosie: {
+        '/api': {
+          emit: stub()
+        },
+        '/api/robots': {
           emit: stub()
         }
       };
 
-      sm._socketItems.yields(socket, 'robots', mcp.robots);
+      sm._socketItems.yields(socket, '/api', mcp);
 
       sm.socketMCP();
     });
@@ -208,8 +215,8 @@ describe('SocketMaster', function() {
 
     it('calls #_socketItems', function() {
       expect(sm._socketItems).to.be.calledWith(
-        '/api/',
-        { robots: mcp.robots }
+        '/api',
+        { '': mcp }
       );
     });
 
@@ -217,12 +224,9 @@ describe('SocketMaster', function() {
       expect(socket.on).to.be.calledWith('robots');
     });
 
-    it('emits "robots" event with params', function() {
-      expect(sm.nsp.robots.emit).to.be.calledTwice;
-      expect(sm.nsp.robots.emit).to.be.calledWith(
-        'robots',
-        ['rosie', 'thelma']
-      );
+    it('emits "/" event with params', function() {
+      expect(sm.nsp['/api'].emit).to.be.calledWith('/');
+      expect(sm.nsp['/api'].emit).to.be.calledWith('robots');
     });
   });
 
@@ -239,15 +243,15 @@ describe('SocketMaster', function() {
       spy(sm, '_addDefaultListeners');
 
       sm.nsp = {
-        robots: {
+        '/api/robots/rosie': {
           emit: stub()
         },
-        rosie: {
+        '/api/robots/thelma': {
           emit: stub()
         }
       };
 
-      sm._socketItems.yields(socket, 'rosie', mcp.robots.rosie);
+      sm._socketItems.yields(socket, '/api/robots/rosie', mcp.robots.rosie);
 
       sm.socketRobots(mcp.robots);
     });
@@ -272,7 +276,7 @@ describe('SocketMaster', function() {
       expect(sm._addDefaultListeners).to.be.calledOnce;
       expect(sm._addDefaultListeners).to.be.calledWith(
         socket,
-        'rosie'
+        '/api/robots/rosie'
       );
     });
   });
@@ -291,13 +295,13 @@ describe('SocketMaster', function() {
       spy(sm, '_addDefaultListeners');
 
       sm.nsp = {
-        robots: {
+        '/api': {
           emit: stub()
         },
-        rosie: {
+        '/api/robots/rosie': {
           emit: stub()
         },
-        led: {
+        '/api/robots/rosie/devices/led': {
           emit: stub()
         },
       };
@@ -306,7 +310,11 @@ describe('SocketMaster', function() {
       led.on = stub();
       led.on.yields();
 
-      sm._socketItems.yields(socket, 'led', mcp.robots.rosie.devices.led);
+      sm._socketItems.yields(
+        socket,
+        '/api/robots/rosie/devices/led',
+        mcp.robots.rosie.devices.led
+      );
 
       sm.socketDevices(mcp.robots.rosie);
     });
@@ -328,7 +336,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "message" event', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith('message');
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith('message');
     });
 
     it('adds a listener for "commands" to the socket', function() {
@@ -336,7 +345,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "commands" event', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith(
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith(
         'commands',
         ['turn_on']
       );
@@ -347,7 +357,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "events" event', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith(
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith(
         'events',
         mcp.robots.rosie.devices.led.events
       );
@@ -358,7 +369,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "command" event with (command, turn_on, 1)', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith(
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith(
         'command',
         { command: 'turn_on', returned: 1 }
       );
@@ -369,7 +381,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "events" event', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith(
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith(
         'turn_on',
         1
       );
@@ -380,7 +393,8 @@ describe('SocketMaster', function() {
     });
 
     it('emits "events" event', function() {
-      expect(sm.nsp.led.emit).to.be.calledWith(
+      var route = '/api/robots/rosie/devices/led';
+      expect(sm.nsp[route].emit).to.be.calledWith(
         'turn_on'
       );
     });
@@ -389,7 +403,7 @@ describe('SocketMaster', function() {
       expect(sm._addDefaultListeners).to.be.calledOnce;
       expect(sm._addDefaultListeners).to.be.calledWith(
         socket,
-        'led'
+        '/api/robots/rosie/devices/led'
       );
     });
   });
