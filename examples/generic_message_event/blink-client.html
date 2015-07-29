@@ -21,7 +21,7 @@
 
     window.onload = function() {
       // Connect to the main api socket
-      cylon = io('http://127.0.0.1:3000/api/robots');
+      cylon = io('http://127.0.0.1:3000/api');
 
       console.log('Setting up socket connections:');
 
@@ -84,6 +84,10 @@
           $('#messages').append($('<li>').text(msg));
         }
       });
+
+      // Send the api a 'robots' to receive the list of robots
+      // and trigger the listener we defined above.
+      cylon.emit('robots');
     };
   </script>
   <body>
