@@ -28,6 +28,7 @@
       // On connection the 'robots' event is emitted
       // and returns a list of available robots.
       cylon.on('robots', function(robots) {
+
         if (!robot) {
           console.log('list of robots:', robots);
 
@@ -45,8 +46,9 @@
               // so we create a new socket for `asensor` device.
               device = io('http://127.0.0.1:3000' + robot.nsp + '/devices/asensor');
 
-              // Listen to the 'message' event on device
-              device.on('message', function(msg) {
+              // Listen to the 'loopback' event,
+              // make sure we can communicate through the socket
+              device.on('loopback', function(msg) {
                 $('#messages').append($('<li>').text(msg));
               });
 
@@ -62,9 +64,9 @@
               // Every time a commands is executed the 'command' event
               // is triggered, returns the name of the command executed
               // and the value returned
-              device.on('command', function(command, value) {
-                console.log('command name ==>', command);
-                console.log('command returned ==>', value);
+              device.on('command', function(payload) {
+                console.log('command name ==>', payload.name);
+                console.log('command data ==>', payload.data);
               });
 
               // Listen to the 'events' event on device
@@ -93,6 +95,15 @@
                 console.log('Analog read ==>', value);
               });
 
+              // We can also listen to the more generic `event`
+              // event, which returns a payload containing the
+              // name of the event and data.
+              // eg. { name: 'analogRead', data: 250 }
+              // device.on('event', function(payload) {
+              //   console.log('event.name ==>', payload.name);
+              //   console.log('event.data ==>', payload.data);
+              // });
+
               /*
                 // There are two ways to send commands to a device,
                 // The first one (we preffer this one) is by emitting
@@ -105,7 +116,7 @@
                 device.emit(
                   'command',
                   {
-                    command: 'turn_on',
+                    name: 'turn_on',
                     args: ['arg1', 'arg2', 'arg3']
                   }
                 )'
@@ -113,6 +124,7 @@
                 // They do pretty much the same just different syntax sugar
               */
             }
+
           });
 
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
@@ -126,7 +138,7 @@
       cylon.emit('robots');
 
       $('form').submit(function(){
-        device.emit('message', $('#m').val());
+        device.emit('loopback', $('#m').val());
         $('#m').val('');
 
         return false;

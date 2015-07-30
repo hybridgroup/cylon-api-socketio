@@ -37,10 +37,11 @@
 
           robot.on('message', function(payload) {
             console.log('On Robot');
-            console.log('  Event:', payload.event);
+            console.log('  Event:', payload.name);
+            console.log('  Type:', payload.type);
             console.log('  Data:', payload.data);
             $('#messages').append($('<li>').text('On Robot:'));
-            $('#messages').append($('<li>').text('event:' + payload.event.toString()));
+            $('#messages').append($('<li>').text('event:' + payload.name.toString()));
             if (!!payload.data) {
               $('#messages').append($('<li>').text('data:' + payload.data.toString()));
             }
@@ -65,10 +66,11 @@
 
           device.on('message', function(payload) {
             console.log('On Device');
-            console.log('  Event:', payload.event);
+            console.log('  Name:', payload.name);
+            console.log('  Type:', payload.type);
             console.log('  Data:', payload.data);
             $('#messages').append($('<li>').text('On Device:'));
-            $('#messages').append($('<li>').text('  Event:' + payload.event.toString()));
+            $('#messages').append($('<li>').text('  Event:' + payload.name.toString()));
             if (!!payload.data) {
               $('#messages').append($('<li>').text('  Data:' + payload.data.toString()));
             }
