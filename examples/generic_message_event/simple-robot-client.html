@@ -28,10 +28,11 @@
 
       robot.on('message', function(payload) {
         console.log('On Robot');
-        console.log('  Event:', payload.event);
+        console.log('  Name:', payload.name);
+        console.log('  Type:', payload.type);
         console.log('  Data:', payload.data);
         $('#messages').append($('<li>').text('On Robot:'));
-        $('#messages').append($('<li>').text('event:' + payload.event.toString()));
+        $('#messages').append($('<li>').text('event:' + payload.name.toString()));
         if (!!payload.data) {
           $('#messages').append($('<li>').text('data:' + payload.data.toString()));
         }

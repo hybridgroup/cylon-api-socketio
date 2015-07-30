@@ -35,7 +35,7 @@
           // any of them and connect to their socket.
           robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
 
-	        robot.on('message', function(msg) {
+	  robot.on('loopback', function(msg) {
             $('#messages').append($('<li>').text(msg));
           });
 
@@ -50,10 +50,10 @@
 
           // Every time a commands is executed the 'command' event
           // is triggered, returns the name of the command executed
-          // and the value returned
-          robot.on('command', function(command, value) {
-            console.log('Robot command name ==>', command);
-            console.log('Robot command returned ==>', value);
+          // and the data returned
+          robot.on('command', function(payload) {
+            console.log('Robot command name ==>', payload.name);
+            console.log('Robot command data ==>', payload.data);
           });
 
           // Listen for the 'events' event
@@ -65,28 +65,12 @@
             $('#messages').append($('<li>').text(msg));
           });
 
-           // Listen for robot specific events,
-          // this must be declared when defining a robot in
-          // cylon, check examples/robot/events.js for more
-          // details on how to setup robot listeners in the API.
-          robot.on('turned_on', function(data, val){
-            console.log('data:', data);
-            console.log('val:', val);
-            console.log('TURNED_ON!!!');
-          });
-
-          robot.on('turned_off', function(data, val){
-            console.log('data:', data);
-            console.log('val:', val);
-            console.log('TURNED_OFF!!!');
-          });
-
           // The "hello world" program of robotics, the
           // blink and LED program, we just emit the command
           // we want our robot to execute.
           setInterval(function() {
             robot.emit('toggle');
-          }, 1000);
+          }, 2000);
 
 
           msg = 'You have been subscribed to Cylon sockets:' + robot.nsp;
@@ -100,7 +84,7 @@
       cylon.emit('robots');
 
       $('form').submit(function(){
-        robot.emit('message', $('#m').val());
+        robot.emit('loopback', $('#m').val());
         $('#m').val('');
 
         return false;

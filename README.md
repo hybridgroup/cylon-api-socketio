@@ -106,7 +106,7 @@ Once you have added the api to your Cylon.js code, and your robots are up and ru
         device.emit(
           'command',
           {
-            command: 'angle',
+            name: 'angle',
             args: [180, 'arg2', 'arg3']
           }
         );'

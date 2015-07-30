@@ -238,7 +238,7 @@ describe('SocketMaster', function() {
         on: stub()
       };
 
-      socket.on.yields({ command: 'turn_on', args: [] });
+      socket.on.yields({ name: 'turn_on', args: [] });
       stub(sm, '_socketItems');
       spy(sm, '_addDefaultListeners');
 
@@ -289,7 +289,7 @@ describe('SocketMaster', function() {
         on: stub()
       };
 
-      socket.on.yields({ command: 'turn_on', args: [] });
+      socket.on.yields({ name: 'turn_on', args: [] });
 
       stub(sm, '_socketItems');
       spy(sm, '_addDefaultListeners');
@@ -331,8 +331,8 @@ describe('SocketMaster', function() {
       );
     });
 
-    it('adds a listener for "message" to the socket', function() {
-      expect(socket.on).to.be.calledWith('message');
+    it('adds a listener for "loopback" to the socket', function() {
+      expect(socket.on).to.be.calledWith('loopback');
     });
 
     it('emits "message" event', function() {
@@ -372,7 +372,7 @@ describe('SocketMaster', function() {
       var route = '/api/robots/rosie/devices/led';
       expect(sm.nsp[route].emit).to.be.calledWith(
         'command',
-        { command: 'turn_on', returned: 1 }
+        { name: 'turn_on', data: 1 }
       );
     });
 
@@ -380,23 +380,8 @@ describe('SocketMaster', function() {
       expect(socket.on).to.be.calledWith('turn_on');
     });
 
-    it('emits "events" event', function() {
-      var route = '/api/robots/rosie/devices/led';
-      expect(sm.nsp[route].emit).to.be.calledWith(
-        'turn_on',
-        1
-      );
-    });
-
     it('adds a listener for "turn_on" to the device', function() {
       expect(led.on).to.be.calledWith('turn_on');
-    });
-
-    it('emits "events" event', function() {
-      var route = '/api/robots/rosie/devices/led';
-      expect(sm.nsp[route].emit).to.be.calledWith(
-        'turn_on'
-      );
     });
 
     it('calls #_addDefaultListeners', function() {

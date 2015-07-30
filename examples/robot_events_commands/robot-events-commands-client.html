@@ -36,7 +36,7 @@
           robot = io('http://127.0.0.1:3000/api/robots/' + robots[0]);
 
           // Listen to the 'message' event on device
-          robot.on('message', function(msg) {
+          robot.on('loopback', function(msg) {
             $('#messages').append($('<li>').text(msg));
           });
 
@@ -52,9 +52,9 @@
           // Every time a commands is executed the 'command' event
           // is triggered, returns the name of the command executed
           // and the value returned
-          robot.on('command', function(command, value) {
-            console.log('Robot command name ==>', command);
-            console.log('Robot command returned ==>', value);
+          robot.on('command', function(payload) {
+            console.log('Robot command name ==>', payload.name);
+            console.log('Robot command data ==>', payload.data);
           });
 
           // Listen to the 'events' event on device
@@ -66,29 +66,18 @@
             $('#messages').append($('<li>').text(msg));
           });
 
-           // Listen for robot specific events,
+          // Listen for robot specific events,
           // this must be declared when defining a robot in
           // cylon, check examples/robot/events.js for more
           // details on how to setup robot listeners in the API.
-          robot.on('turned_on', function(data, val){
-            console.log('data:', data);
-            console.log('val:', val);
+          robot.on('turned_on', function(payload){
+            console.log('data:', payload.data);
             console.log('TURNED_ON!!!');
           });
 
-          robot.on('turned_off', function(data, val){
-            console.log('data:', data);
-            console.log('val:', val);
+          robot.on('turned_off', function(payload){
+            console.log('data:', payload.data);
             console.log('TURNED_OFF!!!');
-          });
-
-          // The toggle event is triggered when you emit the 'toggle'
-          // command. We do this for all commands, that way if the command
-          // returns something, the returned value will be included
-          // in the callback function `data` param. Otherwise it
-          // is going to be null.
-          robot.on('toggle', function(data){
-            console.log('TOGGLE COMMAND EXECUTED!!!');
           });
 
           // The "hello world" program of robotics, the
@@ -115,7 +104,7 @@
       cylon.emit('robots');
 
       $('form').submit(function(){
-        robot.emit('message', $('#m').val());
+        robot.emit('loopback', $('#m').val());
         $('#m').val('');
 
         return false;
