@@ -1,5 +1,7 @@
 ## Release History
 
+0.4.0 - Further CPPP-IO Compliance, MCP data, MCP commands/events
+
 0.3.0 - Remove Express, code refactoring
 
 0.2.5 - Correct examples
